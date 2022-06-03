@@ -28,6 +28,7 @@ use App\obligation;
 use \NumberFormatter;
 use Auth;
 use App\inventory_mov;
+use App\ppe;
 
 class ReportController extends Controller
 {
@@ -40,8 +41,9 @@ class ReportController extends Controller
 
     public function reportview(){
         $masters = master_account::all(); 
-        $employees = employee::all();
-        return view('reports.reports')->with('masters', $masters)->with('employees',$employees);
+        $employees = employee::orderBy('first_name')->get();
+        $ppes = ppe::all();
+        return view('reports.reports')->with('masters', $masters)->with('employees',$employees)->with('ppes',$ppes);
     }
 
     public function barcodelist(){
@@ -316,7 +318,7 @@ class ReportController extends Controller
 		            'unit_cost' =>  $invs->unit_cost,
 		            'amount' =>  $invs->amount,
 		        );
-		}
+		  }
             
         }
 

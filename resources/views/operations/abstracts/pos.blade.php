@@ -71,7 +71,9 @@
                            
                            @if($pr['status'] == 'INSPECTED AND RECEIVED' || $pr['status'] == 'STOCKED IN')
                               <button type="button" class="btn btn-warning printiar" title="Edit" data-id="{{$pr['id']}}" data-name="{{$pr['no']}}" data-total="{{$pr['total_amount']}}" data-date="{{$pr['date']}}"><i class="fa fa-list"></i> Print IAR</button>
-                              
+                              @if($pr['prtype'] == 3 || $pr['prtype'] == 2)
+                                  <button type="button" class="btn btn-primary createics" data-type="rfq"  title="Create" data-id="{{$pr['id']}}" data-supplier="{{$pr['supplier']}}" data-no="{{$pr['iarno']}}" data-name="{{$pr['no']}}" data-amount="{{$pr['total_amount']}}" ><i class="fa fa-plus-square"></i> Create ICS/PAR</button>
+                               @endif    
                            @endif
                         </div>
                         </td>
@@ -330,6 +332,8 @@
   </form>
   </div>
 
+
+
 <div id="modaldemo1" class="modal fade">
     <div class="modal-dialog modal-dialog-vertical-center modal-lg" style="width: 100%" role="document">
       <div class="modal-content bd-0 tx-14">
@@ -375,8 +379,83 @@
     </div>
    <!-- modal-dialog -->
   </div><!-- modal -->
+  <div id="mySidenav3" class="sidenav2">
+    <form action="{{route('submiticspar')}}" method="POST">
 
+    <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+    <input type="hidden" class="form-control iarno" name="iarno"  placeholder="Fund Cluster">
+          <a href="javascript:void(0)" class="closebtn" onclick="closeNavall('mySidenav3')">&times;</a>
+        <br>
+        <br>
+          <h3 class="tx-inverse" id="lbl">CREATE ICS/PAR</h3>
+        <br>
+         <div class="form-layout form-layout-2">
+                    <div class="row no-gutters pd-x-25">
+                      <div class="col-md-4 mg-t--1 mg-md-t-0">
+                        <div class="form-group mg-md-l--1">
+                          <label class="form-control-label" id="lbltxt">Entity Name: <span class="tx-danger">*</span></label>
+                          <select class="form-control select2-show-search" name="entity" style="width: 100%" data-placeholder="Choose one (with searchbox)" tabindex="-1" aria-hidden="true">
+                                    @foreach($mas as $m)
+                                      <option value="{{$m->id}}">{{$m->name}}</option>
+                                    @endforeach
+                                 </select>
+                        </div>
+                      </div><!-- col-4 -->
+                    
+                      <div class="col-md-4 mg-t--1 mg-md-t-0">
+                        <div class="form-group mg-md-l--1">
+                          <label class="form-control-label">Fund Cluster: <span class="tx-danger">*</span></label>
+                          <input type="text" class="form-control fc" name="fc" id="podate" placeholder="Fund Cluster">
+                        </div>
+                      </div><!-- col-4 -->
+                      <div class="col-md-4 mg-t--1 mg-md-t-0">
+                        <div class="form-group mg-md-l--1">
+                          <label class="form-control-label">Date: <span class="tx-danger">*</span></label>
+                          <input type="text" class="form-control date" name="date" placeholder="MM/DD/YYYY">
+                        </div>
+                      </div><!-- col-4 -->
+                    </div>
+                  </div>
+                  <hr/>
+                  <h5 class="lh-3 mg-b-20 name tx-uppercase tx-inverse tx-bold">List of Items</h5>
+                <div class="row ">
+                   <div class="col-md-12 pd-x-55">
+                     <table class="table table-bordered">
+                       <thead class="thead-colored thead-dark tx-black">
+                         <tr>
+                           <th>Form Type</th>
+                           <th>Form No</th>
+                           <th>Stock No</th>
+                           <th>Item</th>
+                           <th>Brand</th>
+                           <th>Quantity</th>
+                           <th>Unit</th>
+                           <th>Unit Cost</th>
+                           <th>Item/Property No</th>
+                           <th>Issued To</th>
+                           <th>Issued By</th>
+                         </tr>
+                       </thead>
+                       <tbody id="icsitemlist"></tbody>
+                     </table>
+                  </div>
+               
 
+               <div class="row bg-gray-100 tx-inverse" id="itemlist">
+
+                </div>
+
+              </div> 
+
+              <hr>
+                <div class="row return pd-x-55 tx-right">
+                  <div class="col-md-12 ">
+                    <button type="submit" class="btn btn-lg btn-primary ">Submit Form</button>
+                  </div>
+                </div>
+        </form>
+     </div>
+  </div>
 
    <div id="mySidenav" class="sidenav2">
 <form action="{{route('submitacc')}}" method="POST">
@@ -599,7 +678,9 @@ $('.suppliers').on('change', function (e) {
 });
 
 var employees = {!! json_encode($employees->toArray()) !!};
+var refs = {!! json_encode($refs) !!};
 var units = {!!json_encode($units)!!};
+console.log(refs);
 units.forEach(function(key){
                array.push(key.name);
             })
@@ -722,7 +803,66 @@ if(status != 'FOR ORS/BURS'){
       });
     });
 
+    $(document).on("click", '.createics', function(){
+      var b = 1
+      var rf = $(this).data('no');
+      $.get("{{route('getpolist')}}",
+        {
+           _token: document.getElementById('token').value,
+            id: $(this).data('id')
+        },
+        function(data,status){
+          if(status == 'success'){
+            $('.iarno').val(rf);
+            var tr = '';
+            var a = 1;
+            var table = document.getElementById('icsitemlist');
+             data.forEach(function(k3){
+              var formno = (k3.unit_cost * k3.qty) < 15000 ? refs[0] : refs[1];
+                var issuedto = '<select class="form-control employees" name="items['+b+'][issuedto]" id="inemployee" style="width: 100%" data-placeholder="Choose one (with searchbox)" tabindex="-1" aria-hidden="true">'+
+                    '@foreach($employees as $employee)'+
+                      '<option value="{{$employee->id}}">{{$employee->first_name.' '.$employee->last_name}}</option>'+
+                    '@endforeach'+
+                  '</select>';
+                  var issuedby = '<select class="form-control employees" name="items['+b+'][issuedby]" id="inemployee" style="width: 100%" data-placeholder="Choose one (with searchbox)" tabindex="-1" aria-hidden="true">'+
+                    '@foreach($employees as $employee)'+
+                      '<option value="{{$employee->id}}">{{$employee->first_name.' '.$employee->last_name}}</option>'+
+                    '@endforeach'+
+                  '</select>';
+                  var form = (k3.unit_cost * k3.qty) < 15000 ? "FOR ICS" :"FOR PAR";
+                  for(var it = 0; it<k3.qty; it++){
+                      tr+= '<tr><td><p class="tx-bold"><input type="hidden" value="ics" items["+b+"][type]/>'+form+'</p></td>'+
+                          '<td><input type="hidden" class name="items['+b+'][id]" value='+k3.no+'><input type="text" class=" form-control total" value="'+formno+'" name="items['+b+'][form_no]"></td>'+
+                          '<td><input type="hidden" class name="items['+b+'][id]" value='+k3.no+'>'+k3.no+'</td>'+
+                          '<td>'+k3.name+'</td>'+
+                          '<td><input type="text" class="form-control" name="items['+b+'][brand]"></td>'+
+                          '<td><input type="hidden" class name="items['+b+'][qty]" value=1>1</td>'+
+                          '<td><input type="hidden" class name="items['+b+'][unit]" value='+k3.unit+'>'+k3.unit+'</td>'+
+                          '<td><input type="hidden" class name="items['+b+'][unit_cost]" value='+k3.unit_cost+'>'+k3.unit_cost+'</td>'+
+                          '<td><input type="text" class="form-control" name="items['+b+'][itemno]"></td>'+
+                          '<td><select class="form-control employees" name="items['+b+'][issuedto]" id="inemployee" style="width: 100%" data-placeholder="Choose one (with searchbox)" tabindex="-1" aria-hidden="true">'+
+                              '@foreach($employees as $employee)'+
+                                '<option value="{{$employee->id}}">{{$employee->first_name.' '.$employee->last_name}}</option>'+
+                              '@endforeach'+
+                            '</select></td>'+
+                          '<td><select class="form-control employees" name="items['+b+'][issuedby]" id="inemployee" style="width: 100%" data-placeholder="Choose one (with searchbox)" tabindex="-1" aria-hidden="true">'+
+                            '@foreach($employees as $employee)'+
+                              '<option value="{{$employee->id}}">{{$employee->first_name.' '.$employee->last_name}}</option>'+
+                            '@endforeach'+
+                          '</select></td>'+
+                        '</tr>';
+                        b++;
+                  }
+                
+               });
+            
+            table.innerHTML = tr;
 
+            openNavall('mySidenav3')
+
+            }
+        });
+    })
 
     $(document).on("click", '.stockin', function(){
       

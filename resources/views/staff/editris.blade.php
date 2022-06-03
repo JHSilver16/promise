@@ -14,15 +14,15 @@
 
               <form action="{{route('submitrisstaff')}}" method="POST" data-parsley-validate="">
                  <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
-                  <input type="hidden" name="id" id="id" value="{{ csrf_token() }}">
-                  <input type="hidden" name="type" id="type" value="save">
+                  <input type="hidden" name="id" id="id" value="{{$ris->id}}">
+                  <input type="hidden" name="type" id="type" value="edit">
                   <div class="form-layout form-layout-2">
                       <div class="row no-gutters">
                           
                         <div class="col-md-3 mg-t--1 mg-md-t-0">
                           <div class="form-group mg-md-l--1">
                             <label class="form-control-label vlabel">RIS No: <span class="tx-danger">*</span></label>
-                           <input type="text" name="no" class="form-control" value="{{$ref}}" readonly="" id="prno" placeholder="Purchase Request Number">
+                           <input type="text" name="no" class="form-control" value="{{$ris->ref_no}}" readonly="" id="prno" placeholder="Purchase Request Number">
                           </div>
                         </div>
                         <div class="col-md-3 mg-t--1 mg-md-t-0">
@@ -34,18 +34,18 @@
                          <div class="col-md-3 mg-t--1 mg-md-t-0">
                           <div class="form-group mg-md-l--1">
                             <label class="form-control-label vlabel">Fund Cluster: <span class="tx-danger">*</span></label>
-                           <input type="text" name="fc" class="form-control" value="101" readonly="" id="entity" placeholder="Account Code">
+                           <input type="text" name="fc" class="form-control" value="{{$ris->fund_cluster}}" readonly="" id="entity" placeholder="Account Code">
                           </div>
                         </div>
                          <div class="col-md-3 mg-t--1 mg-md-t-0">
                           <div class="form-group mg-md-l--1">
                             <label class="form-control-label vlabel">Date: <span class="tx-danger">*</span></label>
-                           <input type="text" class="form-control" required="" name="date" value="{{Carbon\Carbon::now()->toDateString()}}" readonly="" placeholder="MM/DD/YYYY">
+                           <input type="text" class="form-control" required="" name="date" value="{{$ris->date}}" readonly="" placeholder="MM/DD/YYYY">
                           </div>
                         </div>                        
                         <div class="col-md-2 mg-t--1 mg-md-t-0">
                           <div class="form-group mg-md-l--1">
-                            <label class="form-control-label vlabel">Request from: <span class="tx-danger">*</span></label>
+                            <label class="form-control-label vlabel">Request for: <span class="tx-danger">*</span></label>
                             <select class="form-control select2-show-search employees" name="master" id="master" style="width: 100%" data-placeholder="Choose one (with searchbox)" tabindex="-1" aria-hidden="true">
                              @foreach($accounts as $acc)
                               <option value="{{$acc->id}}">{{$acc->name}}</option>
@@ -56,7 +56,7 @@
                         <div class="col-md-10 mg-t--1 mg-md-t-0">
                           <div class="form-group mg-md-l--1">
                             <label class="form-control-label vlabel">Purpose: <span class="tx-danger">*</span></label>
-                           <input type="text" name="purpose" class="form-control" required="" value=""  id="prno" placeholder="Purpose of Requisition">
+                           <input type="text" name="purpose" class="form-control" required="" value="{{$ris->purpose}}"  id="prno" placeholder="Purpose of Requisition">
                           </div>
                         </div>
                       </div><!-- row -->
@@ -80,30 +80,31 @@
                 </tr>
               </thead>
               <tbody class="tbody">
-                <tr>
-                  <td>
-                    <input type="text" class="form-control stock" readonly="" name="items[1][stockno]">
-                  </td>
-                  <td>
+                @foreach($rislines as $ris)
+                  <tr>
+                    <td>
+                      <input type="hidden" class="form-control id" readonly="" value="{{$ris->id}}" name="items[{{$ris->id}}][id]">
+                    <input type="text" class="form-control stock" readonly="" value="{{$ris->stock}}" name="items[{{$ris->id}}][stockno]">
+                    </td>
+                    <td>
                     <div class="autocomplete">
-                      <input type="text" class="form-control units"  name="items[1][unit]">
+                      <input type="text" class="form-control units" value="{{$ris->unit}}"  name="items[{{$ris->id}}][unit]">
                     </div>
                   </td>
                   <td>
                     <div class="autocomplete">
-                      <input class="form-control items" placeholder="Item Description">
+                      <input class="form-control items" autofocus value="{{$ris->name}}" placeholder="Item Description">
                     </div>
                   </td>
-                  <td>
-                    <input type="text" class="form-control qty"  name="items[1][qtyreq]">
-                  </td>
-                  <td>
-                    <input type="text" class="form-control qtystock" onkeydown="isKeyPressed(event)"  name="items[1][stock]">
-                  </td>
-                 
-                 
+                    <td>
+                      <input type="text" class="form-control qty"  value="{{$ris->req_qty}}" name="items[{{$ris->id}}][qtyreq]">
+                    </td>
+                    <td>
+                      <input type="text" class="form-control qtystock" value="{{$ris->available}}" onkeydown="isKeyPressed(event)"  name="items[{{$ris->id}}][stock]">
+                    </td>
                    
-                </tr>
+                  </tr>
+              @endforeach
 
               </tbody>
             </table>

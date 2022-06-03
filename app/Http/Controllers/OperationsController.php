@@ -22,6 +22,10 @@ use App\acceptance;
 use App\classification;
 use App\rfq_line;
 use App\master_account;
+use App\ics_forms;
+use App\ics_inventories;
+use App\properties;
+use App\par_forms;
 use App\po_line;
 use App\ris;
 use App\ris_line;
@@ -544,7 +548,7 @@ class OperationsController extends Controller
                 $control = DB::table('purchase_orders')->where('ref_no', $data['refno'])->first();
                 $ref = $data['refno'];
                 if($control != null){
-                     $controls = DB::table('purchase_orders')->orderBy('id','desc')->first();
+                    $controls = DB::table('purchase_orders')->orderBy('id','desc')->first();
                     $ref =  'PO-'.Carbon::now()->year.'-'.(Carbon::now()->month < 10 ? '0'.Carbon::now()->month : Carbon::now()->month).'-'.sprintf('%03d', $controls->id+1);
                 }
 
@@ -662,14 +666,32 @@ class OperationsController extends Controller
             return redirect(route('pos'))->with('success', 'PO No. '.$po->ref_no.' Saved Successfully');
         }
         public function pos(){
-            $pos = purchase_order::join('purchase_requests', 'pr_no', '=', 'purchase_requests.ref_no')->join('suppliers', 'supplier_id', '=', 'suppliers.id')->join('employees', 'certified_funds', '=', 'employees.id')->leftjoin('master_accounts', 'master_id', '=', 'master_accounts.id')->select('purchase_orders.*', 'employees.first_name', 'employees.last_name', 'suppliers.name', 'purchase_requests.purpose', 'master_accounts.name as acc','purchase_requests.ref_no as prno')->get();
+            $pos = purchase_order::join('purchase_requests', 'pr_no', '=', 'purchase_requests.ref_no')->join('suppliers', 'supplier_id', '=', 'suppliers.id')->join('employees', 'certified_funds', '=', 'employees.id')->leftjoin('master_accounts', 'master_id', '=', 'master_accounts.id')->select('purchase_orders.*', 'employees.first_name', 'employees.last_name', 'suppliers.name', 'purchase_requests.purpose', 'purchase_requests.type','master_accounts.name as acc','purchase_requests.ref_no as prno')->get();
             $procmodes = DB::table('procmodes')->get();
-            $employees = employee::all();
+            $employees = employee::orderBy('first_name')->get();
             $suppliers = supplier::all();
             $mas = master_account::where('type', 'master')->get();;
             $units = unit::all();
             $array = [];
+            $icscontrols = DB::table('ics_forms')->orderBy('id','desc')->first();
+            $icsref='';
+            if($icscontrols == null){
+                $icsref =  'ICS-'.Carbon::now()->year.'-'.(Carbon::now()->month < 10 ? '0'.Carbon::now()->month : Carbon::now()->month).'-001';
+            }
+            else{
+                $icsref =  'ICS-'.Carbon::now()->year.'-'.(Carbon::now()->month < 10 ? '0'.Carbon::now()->month : Carbon::now()->month).'-'.sprintf('%03d', $icscontrols->id+1);
+            }
+            $parref='';           
+            $parcontrols = DB::table('par_forms')->orderBy('id','desc')->first();
+             if($parcontrols == null){
+                $parref =  'PAR-'.Carbon::now()->year.'-'.(Carbon::now()->month < 10 ? '0'.Carbon::now()->month : Carbon::now()->month).'-001';
+            }
+            else{
+               $parref =  'PAR-'.Carbon::now()->year.'-'.(Carbon::now()->month < 10 ? '0'.Carbon::now()->month : Carbon::now()->month).'-'.sprintf('%03d', $parcontrols->id+1);
+            }
+            
             foreach ($pos as $key) {
+                
                 $qty = po_line::where('po_id', $key->id)->count('id');
                 $iar = acceptance::where('po_id', $key->id)->join('employees as a', 'inspected_by', '=', 'a.id')->join('employees as b', 'received_by', '=', 'b.id')->select('acceptances.*', DB::raw('CONCAT(a.last_name, ", ", a.first_name) AS infull_name'), DB::raw('CONCAT(b.last_name, ", ", b.first_name) AS rcfull_name'))->first();
                 $array[] = array(
@@ -686,6 +708,7 @@ class OperationsController extends Controller
                     'purpose' => $key->purpose,
                     'total_amount' => $key->amount,
                     'date' => $key->date,
+                    'prtype'=> $key->type,
                     'status' => $key->status,
                     'iarno' => !empty($iar) ? $iar->ref_no : '',
                     'iardate' => !empty($iar) ? $iar->date : '',
@@ -697,7 +720,7 @@ class OperationsController extends Controller
             
             }
             $acc = new acceptance();
-            return view('operations.abstracts.pos')->with('pos', $array)->with('employees', $employees)->with('suppliers', $suppliers)->with('mas', $mas)->with('procmodes', $procmodes)->with('units', $units)->with('iarno', $acc->getcontrol());
+            return view('operations.abstracts.pos')->with('pos', $array)->with('employees', $employees)->with('suppliers', $suppliers)->with('mas', $mas)->with('procmodes', $procmodes)->with('units', $units)->with('iarno', $acc->getcontrol())->with('refs', array($icsref, $parref));
         }
 
         public function getpolist(Request $data){
@@ -816,14 +839,15 @@ class OperationsController extends Controller
                     $inop->balance = $item['qty'];
                     $inop->save();
                     	
-                    	$invmov = new inventory_mov();
-		        $invmov->inventory_id = $invs->id;
-		        $invmov->quantity = $invs->qty_instock;
-		        $invmov->unit = $invs->unit;
-		        $invmov->unit_cost = $invs->unit_cost;
-		        $invmov->amount = $invs->total_cost;
-		        $invmov->asof = Carbon::parse($data['date']);
-		        $invmov->save();
+                    $invmov = new inventory_mov();
+    		        $invmov->inventory_id = $invs->id;
+    		        $invmov->quantity = $invs->qty_instock;
+    		        $invmov->unit = $invs->unit;
+    		        $invmov->unit_cost = $invs->unit_cost;
+    		        $invmov->amount = $invs->total_cost;
+    		        $invmov->asof = Carbon::parse($data['date']);
+    		        $invmov->save();
+
                 }
                 else{
                     $in = inventory::find($inv[0]);
@@ -831,6 +855,7 @@ class OperationsController extends Controller
                     $in->danger_lvl =$in->qty_instock * 0.10;
                     $in->date = Carbon::now();
                     $in->save();
+                    
                     $inop = new inventory_operation();
                     $inop->inventory_id = $inv[0];
                     $inop->operation = 'IN';
@@ -844,14 +869,14 @@ class OperationsController extends Controller
                     $inop->balance = $item['qty']+$stock[0];
                     $inop->save();
                     
-                        $invmov = new inventory_mov();
-		        $invmov->inventory_id = $in->id;
-		        $invmov->quantity = $in->qty_instock;
-		        $invmov->unit = $in->unit;
-		        $invmov->unit_cost = $in->unit_cost;
-		        $invmov->amount = $in->total_cost;
-		        $invmov->asof = Carbon::parse($data['date']);
-		        $invmov->save();
+                    $invmov = new inventory_mov();
+    		        $invmov->inventory_id = $in->id;
+    		        $invmov->quantity = $in->qty_instock;
+    		        $invmov->unit = $in->unit;
+    		        $invmov->unit_cost = $in->unit_cost;
+    		        $invmov->amount = $in->total_cost;
+    		        $invmov->asof = Carbon::parse($data['date']);
+    		        $invmov->save();
 
                 }
             }
@@ -938,6 +963,7 @@ class OperationsController extends Controller
 
             return redirect(route('ris'))->with('success', 'RIS No. '.$ris->ref_no.' Saved Successfully');
         }
+
 
         public function ris(){
             $ris = new ris();

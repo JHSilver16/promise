@@ -24,8 +24,9 @@
      
       <script src="{{asset('js/amountwords.js')}}"></script>
       <script src="{{asset('js/auto.js')}}"></script>
+       <script src="{{asset('js/autocomp.js')}}"></script>
       <script src="{{asset('js/jsbarcode.min.js')}}"></script>
-    <link href="{{asset('bracket/lib/font-awesome/css/font-awesome.css')}}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{asset('css/font-awesome.min.css')}}">
     <link href="{{asset('bracket/lib/Ionicons/css/ionicons.css')}}" rel="stylesheet" />
     <link href="{{asset('bracket/lib/perfect-scrollbar/css/perfect-scrollbar.css')}}" rel="stylesheet" />
 
@@ -558,6 +559,12 @@ function openNav2() {
     document.getElementById("mySidenav2").style.width = "100%";
 }
 
+function openNavall(div) {
+    document.getElementById(div).style.width = "100%";
+}
+function closeNavall(div) {
+    document.getElementById(div).style.width = "0";
+}
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 }

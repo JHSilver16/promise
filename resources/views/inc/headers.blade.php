@@ -69,6 +69,21 @@
       <a href="{{route('abstracts')}}" class="nav-link"><i class="fa fa-th-list fa-xs"></i> Abstracts</a>
       <a href="{{route('pos')}}" class="nav-link"><i class="fa fa-shopping-cart fa-xs"></i> Purchases Orders with IAR </a>
       <a href="{{route('ris')}}" class="nav-link"><i class="icon ion-ios-download"></i>Requisition and Issue</a>
+    
+    </nav>
+  </div><!-- dropdown-menu -->
+</div>
+<div class="dropdown">
+  <a href="" class="tx-gray-800 d-inline-block nav-link" data-toggle="dropdown">
+    Properties and Equipments
+  </a>
+  <div class="dropdown-menu pd-10 wd-300">
+    <nav class="nav nav-style-1 flex-column">
+      <a href="{{route('pars')}}" class="nav-link"><i class="fa fa-money-check fa-xs"></i> Properties</a>
+      <a href="{{route('ics_inv')}}" class="nav-link"><i class="fa fa-clipboard-list fa-xs"></i>Semi Expendable Equipments</a>
+        <a href="{{route('ptrs')}}" class="nav-link"><i class="fa fa-clipboard-list fa-xs"></i>Property Transfer Forms</a>
+      <a href="{{route('parforms')}}" class="nav-link"><i class="fa fa-clipboard-list fa-xs"></i>Property Acknowledgement Forms</a>
+      <a href="{{route('icsforms')}}" class="nav-link"><i class="fa fa-clipboard-list fa-xs"></i>Inventory Custodian Slips</a>
     </nav>
   </div><!-- dropdown-menu -->
 </div>

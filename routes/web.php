@@ -15,7 +15,7 @@ Route::get('/', function () {
     return redirect(route('login'));
 });
 Route::get('/print', function () {
-    return view('reports.orsprint');
+    return view('reports.unservereport');
 });
 Route::get('/403', function () {
     return view('inc.403');
@@ -125,6 +125,40 @@ Route::get('/itemreqs', 'StaffController@items')->name('itemreqs')->middleware('
 Route::get('/addprstaff', 'StaffController@addpr')->name('addprstaff')->middleware('auth');
 Route::get('/itemliststaff', 'StaffController@itemlist')->name('itemliststaff')->middleware('auth');
 Route::get('/editprstaff/{id}', 'StaffController@editpr')->name('editprstaff')->middleware('auth');
+Route::get('/editrisstaff/{id}', 'StaffController@editris')->name('editrisstaff')->middleware('auth');
 Route::get('/prsstaff', 'StaffController@prs')->name('prsstaff')->middleware('auth');
 Route::post('/requestitem', 'StaffController@requestitem')->name('requestitem')->middleware('auth');
+
+Route::post('/submiticspar', 'ParICSController@submiticspar')->name('submiticspar')->middleware('auth');
+Route::get('/ics_inv', 'ParICSController@ics_inv')->name('ics_inv')->middleware('auth');
+Route::get('/icsforms', 'ParICSController@icsforms')->name('icsforms')->middleware('auth');
+Route::get('/getics', 'ParICSController@getics')->name('getics')->middleware('auth');
+Route::post('/updateics', 'ParICSController@updateics')->name('updateics')->middleware('auth');
+Route::get('/pars', 'ParICSController@pars')->name('pars')->middleware('auth');
+Route::get('/parforms', 'ParICSController@parforms')->name('parforms')->middleware('auth');
+Route::get('/getpar', 'ParICSController@getpar')->name('getpar')->middleware('auth');
+Route::post('/updatepar', 'ParICSController@updatepar')->name('updatepar')->middleware('auth');
+Route::post('/transfer', 'ParICSController@transfer')->name('transfer')->middleware('auth');
+Route::get('/ptrs', 'ParICSController@ptrs')->name('ptrs')->middleware('auth');
+Route::get('/createptr', 'ParICSController@createptr')->name('createptr')->middleware('auth');
+Route::get('/createdisposal', 'ParICSController@createdisposal')->name('createdisposal')->middleware('auth');
+Route::post('/submitptr', 'ParICSController@submitptr')->name('submitptr')->middleware('auth');
+Route::post('/submitdisposal', 'ParICSController@submitdisposal')->name('submitdisposal')->middleware('auth');
+Route::post('/submitprop', 'ParICSController@submitprop')->name('submitprop')->middleware('auth');
+Route::get('/disposals', 'ParICSController@disposals')->name('disposals')->middleware('auth');
+Route::get('/createics', 'ParICSController@createics')->name('createics')->middleware('auth');
+
+
+
+Route::get('/printptr/{id}', 'ParICSReportController@ptr')->name('printptr')->middleware('auth');
+Route::get('/printics/{id}', 'ParICSReportController@icsform')->name('printics')->middleware('auth');
+Route::get('/printpar/{id}', 'ParICSReportController@parform')->name('printpar')->middleware('auth');
+Route::get('/printdisposal/{id}', 'ParICSReportController@disposal')->name('printdisposal')->middleware('auth');
+Route::get('/printcard/{id}/{type}', 'ParICSReportController@card')->name('printcard')->middleware('auth');
+Route::get('/ppelist', 'ParICSReportController@ppelist')->name('ppelist')->middleware('auth');
+Route::get('/empaccount', 'ParICSReportController@empaccount')->name('empaccount')->middleware('auth');
+Route::get('/unservelist', 'ParICSReportController@unservelist')->name('unservelist')->middleware('auth');
+
+Route::get('/updateinventory', 'UpdateController@updateinventory')->name('updateinventory')->middleware('auth');
+
 });

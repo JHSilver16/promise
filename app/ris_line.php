@@ -8,11 +8,20 @@ use App\employee;
 use App\item;
 use App\unit;
 use App\master_account;
+use Illuminate\Database\Eloquent\SoftDeletes; 
 use Carbon\Carbon;
 use Auth;
 
 class ris_line extends Model
 {
+	use SoftDeletes;
+	public function ris_lines($id){
+    	$ris_lines = ris_line::join('items', 'ris_lines.item_id', '=', 'items.id')->where('ris_id', $id)->select('items.name', 'ris_lines.*', 'items.id as stock')->get();
+    	return $ris_lines;
+    }
+    public function deletelines($id){
+    	$ris_lines = ris_line::where('ris_id', $id)->delete();
+    }
     public function updaterline($data, $master, $emp){
     	
     	$division = employee::where('id', $emp)->first();

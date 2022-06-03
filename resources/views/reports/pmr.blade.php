@@ -183,7 +183,6 @@ tr.shown td.details-control {
 		</div>
        </div>
 
-            <input type="hidden" name="type" id="type" value="{{$type}}">
 
        <div class="row pd-t-5">
        	<div class="col-sm-12">

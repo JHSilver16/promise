@@ -41,19 +41,31 @@ class StaffController extends Controller
         ->with('items', $items);
     }
 
-    
+    public function editris($id){
+        $ris = ris::find($id);
+        $risl = new ris_line();
+        $units = unit::all();
+        $accounts = master_account::where('type', 'master')->get();
+        $rislines = $risl->ris_lines($id);
+        $items = item::join('inventories', 'item_id', '=', 'items.id')->where('qty_instock', '>', '0')->select('items.name', 'items.id as stockno', 'inventories.*')->get();
+        return view('staff.editris')->with('rislines', $rislines)->with('ris', $ris)->with('items', $items)->with('accounts', $accounts)->with('units', $units);
+    }
 
     public function submitris(Request $data){
-
+        //return $data->all();
     	$employee = employee::where('id', Auth::user()->employee_id)->first();
         $control = DB::table('ris')->where('ref_no', $data['no'])->first();
-            $ref = $data['no'];
+        $ref = $data['no'];
             if($control != null){
                  $controls = DB::table('ris')->orderBy('id','desc')->first();
                 $ref =  'RIS-'.Carbon::now()->year.'-'.(Carbon::now()->month < 10 ? '0'.Carbon::now()->month : Carbon::now()->month).'-'.sprintf('%03d', $controls->id+1);
-            }
-
-    	$ris = new ris();
+        }
+        $ris = new ris();
+        if($data['type'] == 'edit'){
+            $ris = ris::find($data['id']);
+            $ref = $ris['ref_no'];
+        }
+    	
         $ris->employee_id = Auth::user()->employee_id;
         $ris->fund_cluster = $data['fc'];
         $ris->date = Carbon::parse($data['date']);
@@ -68,7 +80,12 @@ class StaffController extends Controller
         $ris->status = 'PENDING';
         $ris->date_issued = Carbon::parse($data['date']);
         $ris->save();
-        
+        //return $ris;
+        if($data['type'] == 'edit'){
+            $riss = new ris_line();
+            $riss->deletelines($data['id']);
+        }
+        //return (json_decode($data['type'] == 'edit'));
         foreach ($data['items'] as $key => $arr) {
             $rline = new ris_line();
             $rline->ris_id = $ris->id;

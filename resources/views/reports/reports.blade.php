@@ -148,7 +148,7 @@
               </div>
             </div>
             </form>
-                        <form action="{{route('formlist')}}" method="GET" id="listform">
+          <form action="{{route('formlist')}}" method="GET" id="listform">
             <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
             <input type="hidden" name="type" class="type" value="">
             <div class="card">
@@ -181,6 +181,93 @@
               </div>
             </div>
             </form>
+
+      <form action="{{route('ppelist')}}" method="GET">
+        <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+            <div class="card">
+              <div class="card-header" role="tab" id="headingOne">
+                <h6 class="mg-b-0">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#ppe" aria-expanded="true" aria-controls="ppe" class="tx-gray-800 transition">
+                    Report on the Physical Count of Property, Plant, Equipment 
+                  </a>
+                </h6>
+              </div><!-- card-header -->
+              <div id="ppe" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div class="card-block pd-20">
+                  <div class="row">
+                     <div class="col-md-1 tx-inverse tx-16">Type of PPE</div>
+                     <div class="col-md-4 tx-inverse tx-16"> 
+                        <select class="form-control select" style="width: 100%;" name="ppe">
+                           @foreach($ppes as $ppe)
+                              <option value="{{$ppe->id}}">{{$ppe->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-1 tx-inverse tx-16">As Of</div>
+                      <div class="col-md-2"> <input type="text" class="form-control date" name="date" /></div>
+                     
+                       <div class="col-md-2"><button class="btn btn-primary">Generate</button></div>
+                  </div>
+                  <hr>
+                </div>
+              </div>
+            </div>
+            </form>
+
+      <form action="{{route('empaccount')}}" method="GET">
+        <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+            <div class="card">
+              <div class="card-header" role="tab" id="headingOne">
+                <h6 class="mg-b-0">
+                  <a data-toggle="collapse" data-parent="#accordion" href="#empaccount" aria-expanded="true" aria-controls="empaccount" class="tx-gray-800 transition">
+                    Report on the Employee's Property Accountability 
+                  </a>
+                </h6>
+              </div><!-- card-header -->
+              <div id="empaccount" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+                <div class="card-block pd-20">
+                  <div class="row">
+                     <div class="col-md-1 tx-inverse tx-16">Employee</div>
+                     <div class="col-md-4 tx-inverse tx-16"> 
+                        <select class="form-control select2-show-search" style="width: 100%;" name="emp">
+                           @foreach($employees as $emp)
+                              <option value="{{$emp->id}}">{{$emp->first_name.' '.$emp->last_name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                     <div class="col-md-1 tx-inverse tx-16">As Of</div>
+                      <div class="col-md-2"> <input type="text" class="form-control date" name="date" /></div>
+                       <div class="col-md-2"><button class="btn btn-primary">Generate</button></div>
+                  </div>
+                  <hr>
+                </div>
+              </div>
+            </div>
+            </form>
+
+            <form action="{{route('unservelist')}}" method="GET">
+              <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
+                  <div class="card">
+                    <div class="card-header" role="tab" id="headingOne">
+                      <h6 class="mg-b-0">
+                        <a data-toggle="collapse" data-parent="#accordion" href="#unservelist" aria-expanded="true" aria-controls="unservelist" class="tx-gray-800 transition">
+                          List of Unservicable Properties and Equipments
+                        </a>
+                      </h6>
+                    </div><!-- card-header -->
+                    <div id="unservelist" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+                      <div class="card-block pd-20">
+                        <div class="row">
+                           <div class="col-md-1 tx-inverse tx-16">As Of</div>
+                            <div class="col-md-2"> <input type="text" class="form-control date" name="date" /></div>
+                             <div class="col-md-2"><button class="btn btn-primary">Generate</button></div>
+                        </div>
+                        <hr>
+                      </div>
+                    </div>
+                  </div>
+                  </form>
+
            </div>
         </div><!-- accordion -->
      </div>
@@ -194,6 +281,7 @@ showOtherMonths: true,
 selectOtherMonths: true,
 numberOfMonths: 2
 });
+
   $('input[name="daterange"]').daterangepicker({
     opens: 'left'
   }, function(start, end, label) {

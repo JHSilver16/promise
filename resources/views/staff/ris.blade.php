@@ -152,7 +152,7 @@
           }
         });
     $('.edit').click(function(){
-      window.location.href = '{{route ("editpr", ["id" => ''] )}}'+'/'+$(this).data('id')
+      window.location.href = '{{route ("editrisstaff", ["id" => ''] )}}'+'/'+$(this).data('id')
     })
 
  $('.print').click(function(){
