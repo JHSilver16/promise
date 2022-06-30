@@ -58,7 +58,7 @@ return [
             'NO_ENGINE_SUBSTITUTION',
         	],
             'prefix' => '',
-            'strict' => true,
+            'strict' => false,
             'engine' => null,
         ],
 
@@ -71,6 +71,7 @@ return [
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
+            'strict' => false,
         ),
 
         'pgsql' => [
@@ -95,6 +96,7 @@ return [
             'password' => env('DB_PASSWORD', ''),
             'charset' => 'utf8',
             'prefix' => '',
+            'strict' => false,
         ],
 
     ],

@@ -21,7 +21,7 @@
         </li>
 
         <li class="nav-item">
-          <a href="{{route('addpr')}}">
+          <a href="{{route('proplist', ['type' => 'list'])}}">
           <div class="br-menu-item nav-link">
             <i class="menu-item-icon fas fa-plus-circle tx-20"></i>
             <span class="menu-item-label">Print List</span>
@@ -29,7 +29,7 @@
         </a>
         </li>
         <li class="nav-item">
-          <a href="{{route('addpr')}}">
+          <a href="{{route('proplist', ['type' => 'qr'])}}">
           <div class="br-menu-item nav-link">
             <i class="menu-item-icon fas fa-plus-circle tx-20"></i>
             <span class="menu-item-label">Print List with QR</span>

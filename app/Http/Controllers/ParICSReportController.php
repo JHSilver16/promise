@@ -402,4 +402,27 @@ class ParICSReportController extends Controller
 
         return view('reports.unservelist')->with('array', $array)->with('date', Carbon::parse($data['date'])->toFormattedDateString())->with('total', $total);
     }
+
+    public function proplist($type){
+        $props = properties::join('items','properties.item_id', '=', 'items.id')->select('items.name', 'properties.*')->get();
+        //return $props;
+        if($type == 'list'){
+            return view('reports.proplist')->with('properties', $props);
+        }
+        else{
+           return view('reports.proplistqr')->with('properties', $props); 
+        }
+        
+    }
+
+    public function icslist($type){
+        $icvs = ics_inventories::join('items','ics_inventories.item_id', '=', 'items.id')->select('items.name', 'ics_inventories.*')->get();
+        
+        if($type == 'list'){
+            return view('reports.icslist')->with('icvs', $icvs);
+        }
+        else{
+           return view('reports.icslistqr')->with('icvs', $icvs); 
+        }
+    }
 }

@@ -158,6 +158,8 @@ Route::get('/printcard/{id}/{type}', 'ParICSReportController@card')->name('print
 Route::get('/ppelist', 'ParICSReportController@ppelist')->name('ppelist')->middleware('auth');
 Route::get('/empaccount', 'ParICSReportController@empaccount')->name('empaccount')->middleware('auth');
 Route::get('/unservelist', 'ParICSReportController@unservelist')->name('unservelist')->middleware('auth');
+Route::get('/proplist/{type}', 'ParICSReportController@proplist')->name('proplist')->middleware('auth');
+Route::get('/icslist/{type}', 'ParICSReportController@icslist')->name('icslist')->middleware('auth');
 
 Route::get('/updateinventory', 'UpdateController@updateinventory')->name('updateinventory')->middleware('auth');
 

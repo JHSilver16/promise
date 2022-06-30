@@ -232,6 +232,7 @@ class ReportController extends Controller
 
     public function issuedreport(Request $data){
         //return $data->all();
+        
         $date = explode(" - ", $data['daterange']);
         $master = master_account::find($data['entity']);
         $entity = $data['entity'];
@@ -239,14 +240,14 @@ class ReportController extends Controller
             $master = employee::find($data['entity']);
             $entity = master_account::where('name', $master->division)->pluck('id');
         }
-	//return $data->all();
+    //return $data->all();
         $dater = $data['daterange']; 
         $item = inventory::join('items', 'item_id', '=', 'items.id')->where('master_id', $entity)->select('items.name', 'items.description', 'inventories.*')->get();
         $array = [];
         //return $item;
         foreach ($item as $in) {
              $poline = ris_line::join('items', 'ris_lines.item_id', '=', 'items.id')->join('ris', 'ris_id', '=', 'ris.id')->whereBetween('ris.date', [Carbon::parse($date[0])->toDateString(),Carbon::parse($date[1])->toDateString()])->where('item_id', $in->item_id)->select('items.name', 'ris_lines.*', 'items.id as stock', 'ris.ref_no', 'items.id as item_id', 'ris.requested_by')->get();
-             //return $in->item_id;
+             
             if($data['rdio'] == 3){
                
                  $poline = ris_line::join('items', 'ris_lines.item_id', '=', 'items.id')->join('ris', 'ris_id', '=', 'ris.id')->where('item_id', $in->item_id)->where('ris.requested_by', $data['entity'])->where('status', 'ISSUED')->select('items.name', 'ris_lines.*', 'items.id as stock', 'ris.ref_no', 'items.id as item_id', 'ris.requested_by')->get();
@@ -255,7 +256,7 @@ class ReportController extends Controller
              foreach ($poline as $p) {
 
                 $inp = inventory_operation::join('inventories', 'inventory_id', '=', 'inventories.id')->leftjoin('ris', 'ris_id', '=', 'ris.id')->where('ris_id', $p->ris_id)->where('item_id', $p->item_id)->select('inventory_operations.*', 'ris.ref_no as risno')->first();
-		 //var_dump($in->item_id);
+         //var_dump($in->item_id);
                  if(!empty($inp)){
                  
                  $array[] = array(
@@ -267,20 +268,52 @@ class ReportController extends Controller
                     'isqty' =>  $p->issued_qty,
                     'isuc' =>  $inp->unit_cost,
                     'istc' =>  $inp->total_cost,
-                	);
+                    );
                 }
              }
         }
 
+        return view('reports.issuedreport')->with('inventory', $array)->with('master', $master)->with('date', $dater);
+    }
+
+    public function issuedreport2(){
+
+        $date = explode(" - ", $data['daterange']);
+        $master = master_account::find($data['entity']);
+        $entity = $data['entity'];
+        if($data['rdio'] == 3){
+            $master = employee::find($data['entity']);
+            $entity = master_account::where('name', $master->division)->pluck('id');
+        }
+    //return $data->all();
+        $dater = $data['daterange'];
+
+        $item = ris_line::join('items', 'ris_lines.item_id', '=', 'items.id')->join('ris', 'ris_id', '=', 'ris.id')->where('master_id', $entity)->whereBetween('ris.date', [Carbon::parse($date[0])->toDateString(),Carbon::parse($date[1])->toDateString()])->groupBy('item_id')->select('items.name', DB::raw('sum(issued_qty) as issued_qty'), 'items.id as stock', 'items.id as item_id')->get();
+        //return $item;
+        foreach ($item as $in) {
+            $inp = inventory_operation::join('inventories', 'inventory_id', '=', 'inventories.id')->where('item_id', $in->item_id)->select('inventory_operations.*')->first();
+            
+            if(!empty($inp)){
+            $array[] = array(
+                    'refno' => '',
+                    'stock' => $in->stock,
+                    'date'=> $in->date,
+                    'item'=> $in->name,
+                    'unit'=> '',
+                    'isqty' =>  $in->issued_qty,
+                    'isuc' =>  $inp->unit_cost,
+                    'istc' =>  $inp->total_cost,
+                    );
+                }
+            }
+        
+        
         
 
         
         
        // return $array;
         //return($inv);
-        
-
-        return view('reports.issuedreport')->with('inventory', $array)->with('master', $master)->with('date', $dater);
     }
     
     public function inventory(Request $data){
