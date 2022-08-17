@@ -310,14 +310,15 @@ tr.shown td.details-control {
 
           <div class="row tx-11">
             <div class="col-sm-12">TERMS AND CONDITIONS:</div>
+            <div class="col-sm-12">1.      The Delivery Team shall be:      Delivered on site;      Pick-up
+</div>
             <div class="col-sm-12">2.      The above item/s shall be delivered/made available/served within   _____________,  if goods and services, or on _______, if catering services and the like;               
 </div>
             <div class="col-sm-12">3.      Awarding shall be made by:               Item               Lot              Head                
 </div>
             <div class="col-sm-12">4.      Price quotation/s must be valid for  30  calendar days from date of submission and shall be fixed and not subject to price escalation during the contract effectivity;               
 </div>
-<div class="col-sm-12">4.      Price quotation/s must be valid for  30  calendar days from date of submission and shall be fixed and not subject to price escalation during the contract effectivity;               
-</div>
+
 <div class="col-sm-12">5.      Price quotation/s must be in Philippine peso and shall include the applicable taxes;               
               
 </div>
